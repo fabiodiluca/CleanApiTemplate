@@ -10,3 +10,4 @@ This template should address the folowing concers:
 - Balance between RESTFul theory and business logic.
 - User/Clients Authentication and Authorization.
 - Enabling easy unit testing in all components.
+- Database versioning control via code using FluentMigrator.
