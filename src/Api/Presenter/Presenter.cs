@@ -1,7 +1,9 @@
 ﻿using CleanTemplate.Application;
+using CleanTemplate.Application.Notifications;
 using CleanTemplate.Application.UseCases;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -44,6 +46,19 @@ namespace CleanTemplate.Api
             var contentResult = ActionResult as ContentResult;
             contentResult.StatusCode = isInvalid ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
             contentResult.Content = JsonConvert.SerializeObject(responses);
+        }
+
+        public void Handler(Exception exception, bool outputExceptionDetailsToResponse)
+        {
+            var contentResult = ActionResult as ContentResult;
+            contentResult.StatusCode = (int)HttpStatusCode.InternalServerError;
+            var response = new UseCaseResponseMessage<bool>(
+                new NotificationError(
+                    -1,
+                    $"Unexcepcted exception.\r\n{(outputExceptionDetailsToResponse?exception:"")}"
+                )
+            );
+            contentResult.Content = JsonConvert.SerializeObject(response);
         }
     }
 }

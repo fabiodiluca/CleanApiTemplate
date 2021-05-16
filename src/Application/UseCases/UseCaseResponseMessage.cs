@@ -19,8 +19,8 @@ namespace CleanTemplate.Application.UseCases
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="notifications"></param>
-        public UseCaseResponseMessage(NotificationError notifications) : base(notifications) { }
+        /// <param name="notification"></param>
+        public UseCaseResponseMessage(NotificationError notification) : base(notification) { }
 
         /// <summary>
         /// 

@@ -1,3 +1,4 @@
+using CleanTemplate.Api.Filters;
 using CleanTemplate.Api.Settings;
 using CleanTemplate.IoC;
 using Microsoft.AspNetCore.Builder;
@@ -16,18 +17,15 @@ namespace CleanTemplate.Api
 {
     public class Startup
     {
+
         private readonly Logger _logger;
         private readonly AppSettings _appSettings;
         public Startup(IConfiguration configuration)
         {
             _logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
-            Configuration = configuration;
-
             _appSettings = new AppSettings();
-            Configuration.Bind(_appSettings);
+            configuration.Bind(_appSettings);
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -37,9 +35,13 @@ namespace CleanTemplate.Api
             //Create singleton from instance
             services.AddSingleton(_appSettings);
 
-            ConfigureNewtonsoftJson();
+            _ConfigureNewtonsoftJson();
 
-            services.AddControllers().AddNewtonsoftJson();
+            services
+                .AddControllers(options =>
+                    options.Filters.Add(typeof(HttpResponseExceptionFilter))
+                )
+                .AddNewtonsoftJson();
 
             services.AddSwaggerGen(c =>
             {
@@ -57,7 +59,7 @@ namespace CleanTemplate.Api
             services.AddApplicationServices(_appSettings);
         }
 
-        public void ConfigureNewtonsoftJson()
+        private void _ConfigureNewtonsoftJson()
         {
             var setting = new JsonSerializerSettings();
             setting.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -73,7 +75,6 @@ namespace CleanTemplate.Api
             _logger.Info("EnvironmentName={EnvironmentName}.", env.EnvironmentName);
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 _UseSwaggerUI(app);
             }
