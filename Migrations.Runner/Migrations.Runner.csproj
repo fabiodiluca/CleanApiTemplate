@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp5.0</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+    <RootNamespace>CleanTemplate.Migrations.Runner</RootNamespace>
+    <AssemblyName>CleanTemplate.Migrations.Runner</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentMigrator" Version="3.1.3" />
+    <PackageReference Include="FluentMigrator.Runner" Version="3.1.3" />
+    <PackageReference Include="FluentMigrator.Runner.SQLite" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Migration\Migrations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Migrate.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

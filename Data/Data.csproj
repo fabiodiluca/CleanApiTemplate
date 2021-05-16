@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>CleanTemplate.Data</AssemblyName>
+    <RootNamespace>CleanTemplate.Data</RootNamespace>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Data.Model\Data.Model.csproj" />
+    <ProjectReference Include="..\UnitOfWork\UnitOfWork.csproj" />
+  </ItemGroup>
+
+</Project>

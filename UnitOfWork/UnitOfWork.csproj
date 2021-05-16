@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+    <AssemblyName>CleanTemplate.UnitOfWork</AssemblyName>
+    <RootNamespace>CleanTemplate.UnitOfWork</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NHibernate" Version="5.3.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data.Model\Data.Model.csproj" />
+  </ItemGroup>
+
+</Project>
