@@ -10,7 +10,7 @@ using System.Net;
 
 namespace CleanTemplate.Api
 {
-    public class Presenter : IOutputPort<UseCaseResponseMessageBase>, IOutputPort<IEnumerable<UseCaseResponseMessageBase>>, IPresenter
+    public class Presenter : IOutputPort<UseCaseResultMessageBase>, IOutputPort<IEnumerable<UseCaseResultMessageBase>>, IPresenter
     {
         private IActionResult _ActionResult;
         public IActionResult ActionResult { get { return _ActionResult; } }
@@ -20,14 +20,17 @@ namespace CleanTemplate.Api
             _ActionResult = new ContentResult();
         }
 
-        public void Handler(UseCaseResponseMessageBase response)
+        public void Handler(UseCaseInvalidResult invalidResult)
         {
             var contentResult = ActionResult as ContentResult;
-            if (response.GetHttpStatusToOverride().HasValue)
-            {
-                contentResult.StatusCode = response.GetHttpStatusToOverride().Value;
-            }
-            else if (!response.IsValid())
+            contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
+            contentResult.Content = JsonConvert.SerializeObject(invalidResult);
+        }
+
+        public void Handler(UseCaseResultMessageBase response)
+        {
+            var contentResult = ActionResult as ContentResult;
+            if (!response.AnyErrors())
             {
                 contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
             }
@@ -38,13 +41,18 @@ namespace CleanTemplate.Api
             contentResult.Content = JsonConvert.SerializeObject(response);
         }
 
-        public void Handler(IEnumerable<UseCaseResponseMessageBase> responses)
+        /// <summary>
+        /// It at least one user case response was successful it returns HttpStatusCode.OK
+        /// If all user cases were unsuccessful it returns HttpStatusCode.BadRequest
+        /// </summary>
+        /// <param name="responses"></param>
+        public void Handler(IEnumerable<UseCaseResultMessageBase> responses)
         {
-            var isInvalid = responses.Where(w => w != null && !w.IsValid()).Any();
+            var areAllInvalid = responses.Where(w => w.AnyErrors()).Count() == responses.Count();
             object responseMessage = new { errors = responses.Select(x => x.Errors) };
 
             var contentResult = ActionResult as ContentResult;
-            contentResult.StatusCode = isInvalid ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
+            contentResult.StatusCode = areAllInvalid ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
             contentResult.Content = JsonConvert.SerializeObject(responses);
         }
 
@@ -52,7 +60,7 @@ namespace CleanTemplate.Api
         {
             var contentResult = ActionResult as ContentResult;
             contentResult.StatusCode = (int)HttpStatusCode.InternalServerError;
-            var response = new UseCaseResponseMessage<bool>(
+            var response = new UseCaseResult<bool>(
                 new NotificationError(
                     -1,
                     $"Unexcepcted exception.\r\n{(outputExceptionDetailsToResponse?exception:"")}"

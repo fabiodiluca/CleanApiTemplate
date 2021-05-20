@@ -7,7 +7,7 @@ using FluentValidation.Results;
 
 namespace CleanTemplate.Application.UseCases
 {
-    public abstract class UseCaseResponseMessageBase
+    public abstract class UseCaseResultMessageBase
     {
         /// <summary>
         /// 
@@ -24,59 +24,37 @@ namespace CleanTemplate.Application.UseCases
         /// <summary>
         /// 
         /// </summary>
-        [JsonIgnore]
-        protected int? _httpStatusToOverride { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="notificacao"></param>
-        protected UseCaseResponseMessageBase(Notification notificacao)
-        {
-            if (notificacao == null)
-                return;
-
-            ResponseMessageBase(new List<Notification> { notificacao });
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="notificacoes"></param>
-        protected UseCaseResponseMessageBase(IEnumerable<Notification> notificacoes)
+        protected UseCaseResultMessageBase(IEnumerable<NotificationError> notificacoes)
         {
             if (notificacoes != null && !notificacoes.Any())
                 return;
 
-            ResponseMessageBase(notificacoes);
+            Errors = notificacoes;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="notificacoes"></param>
-        /// <param name="tipo"></param>
-        private void ResponseMessageBase(IEnumerable<Notification> notificacoes)
+        protected UseCaseResultMessageBase(IEnumerable<NotificationWarning> notificacoes)
         {
-            var tipo = notificacoes.FirstOrDefault().Type;
+            if (notificacoes != null && !notificacoes.Any())
+                return;
 
-            if (tipo.Equals(NotificationType.Error))
-                Errors = (IEnumerable<NotificationError>)notificacoes;
-
-            else if (tipo.Equals(NotificationType.Warning))
-                Warnings = (IEnumerable<NotificationWarning>)notificacoes;
+            Warnings = notificacoes;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="validationResult"></param>
-        protected UseCaseResponseMessageBase(ValidationResult validationResult)
+        protected UseCaseResultMessageBase(ValidationResult validationResult)
         {
             var ErrorsList = new List<NotificationError>();
             foreach (var error in validationResult.Errors)
             {
-                int ErrorCode = -1;
+                int ErrorCode;
                 Int32.TryParse(error.ErrorCode, out ErrorCode);
                 var errorResponse = new NotificationError(ErrorCode, error.ErrorMessage);
                 ErrorsList.Add(errorResponse);
@@ -88,7 +66,7 @@ namespace CleanTemplate.Application.UseCases
         /// <summary>
         /// 
         /// </summary>
-        protected UseCaseResponseMessageBase() { }
+        protected UseCaseResultMessageBase() { }
 
         /// <summary>
         /// 
@@ -107,19 +85,9 @@ namespace CleanTemplate.Application.UseCases
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool IsValid()
+        public bool AnyErrors()
         {
-            return (Errors == null || !Errors.Any()) &&
-                (Warnings == null || !Warnings.Any());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public int? GetHttpStatusToOverride()
-        {
-            return _httpStatusToOverride;
+            return (Errors == null || !Errors.Any());
         }
     }
 }

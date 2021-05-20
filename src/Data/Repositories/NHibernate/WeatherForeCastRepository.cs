@@ -64,9 +64,12 @@ namespace CleanTemplate.Data.Repositories.NHibernate
             return _mapper.Map<WeatherForeCast>(dataModel);
         }
 
-        public List<WeatherForeCast> Insert(List<WeatherForeCast> model)
+        public List<WeatherForeCast> Insert(List<WeatherForeCast> models)
         {
-            throw new System.NotImplementedException();
+            var returnList = new List<WeatherForeCast>();
+            foreach (var model in models)
+                returnList.Add(Insert(model));
+            return returnList;
         }
 
         public List<WeatherForeCast> Update(List<WeatherForeCast> model)

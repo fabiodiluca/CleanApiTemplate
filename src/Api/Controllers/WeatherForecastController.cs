@@ -29,8 +29,8 @@ namespace CleanTemplate.Api.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(UseCaseResponseMessage<List<WeatherForecastGetResponse>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(UseCaseResponseMessageBase), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(UseCaseResult<WeatherForecastGetResponse[]>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.InternalServerError)]
         public IActionResult Get()
         {
             _logger.LogInformation("Getting WeatherForecast");
@@ -39,13 +39,13 @@ namespace CleanTemplate.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(UseCaseResponseMessage<List<WeatherForecastGetResponse>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(UseCaseResponseMessageBase), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(UseCaseResponseMessageBase), (int)HttpStatusCode.InternalServerError)]
-        public IActionResult Post([FromBody] WeatherForecastPostRequest model)
+        [ProducesResponseType(typeof(UseCaseResult<WeatherForecastGetResponse[]>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.InternalServerError)]
+        public IActionResult Post([FromBody] WeatherForecastPostRequest[] models)
         {
             _logger.LogInformation("Posted WeatherForecast");
-            _presenter.Handler(_weatherForeCastUseCase.Post(model));
+            _presenter.Handler(_weatherForeCastUseCase.Post(models));
             return _presenter.ActionResult;
         }
     }

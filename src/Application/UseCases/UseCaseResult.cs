@@ -9,7 +9,7 @@ namespace CleanTemplate.Application.UseCases
     /// 
     /// </summary>
     /// <typeparam name="TData"></typeparam>
-    public class UseCaseResponseMessage<TData> : UseCaseResponseMessageBase
+    public class UseCaseResult<TData> : UseCaseResultMessageBase
     {
         /// <summary>
         /// 
@@ -20,39 +20,35 @@ namespace CleanTemplate.Application.UseCases
         /// 
         /// </summary>
         /// <param name="notification"></param>
-        public UseCaseResponseMessage(NotificationError notification) : base(notification) { }
+        public UseCaseResult(NotificationError notification) : base(new List<NotificationError>() { notification }) { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="notifications"></param>
-        public UseCaseResponseMessage(IEnumerable<NotificationError> notifications) : base(notifications) { }
+        public UseCaseResult(IEnumerable<NotificationError> notifications) : base(notifications) { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="validationResult"></param>
-        public UseCaseResponseMessage(ValidationResult validationResult) : base(validationResult) { }
+        public UseCaseResult(ValidationResult validationResult) : base(validationResult) { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="data"></param>
-        public UseCaseResponseMessage(TData data)
+        public UseCaseResult(TData data)
         {
             if (data != null)
             {
                 this.Data = data;
-            }
-            else
-            {
-                this._httpStatusToOverride = (int)HttpStatusCode.NoContent;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public UseCaseResponseMessage() { }
+        public UseCaseResult() { }
     }
 }

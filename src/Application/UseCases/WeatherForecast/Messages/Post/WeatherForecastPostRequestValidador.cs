@@ -2,7 +2,7 @@
 
 namespace CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post
 {
-    public class WeatherForecastPostRequestValidador: AbstractValidator<WeatherForecastPostRequest>
+    public class WeatherForecastPostRequestValidador: ModelValidator<WeatherForecastPostRequest>
     {
         public WeatherForecastPostRequestValidador()
         {

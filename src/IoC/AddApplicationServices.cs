@@ -1,4 +1,5 @@
 ﻿using CleanTemplate.Api.Settings;
+using CleanTemplate.Application;
 using CleanTemplate.Application.UseCases.WeatherForecast;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
 using FluentValidation;
@@ -26,7 +27,7 @@ namespace CleanTemplate.IoC
 
         private static void AddValidators(IServiceCollection services)
         {
-            services.AddScoped<IValidator<WeatherForecastPostRequest>, WeatherForecastPostRequestValidador>();
+            services.AddScoped<IModelValidator<WeatherForecastPostRequest>, WeatherForecastPostRequestValidador>();
         }
     }
 }

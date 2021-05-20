@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api.Settings\Api.Settings.csproj" />
+    <ProjectReference Include="..\Api.Settings\ApiSettings.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\IoC\IoC.csproj" />

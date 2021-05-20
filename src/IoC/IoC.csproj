@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api.Settings\Api.Settings.csproj" />
+    <ProjectReference Include="..\Api.Settings\ApiSettings.csproj" />
     <ProjectReference Include="..\Data.Maps\Data.Maps.csproj" />
     <ProjectReference Include="..\Data.NHibernate\Data.NHibernate.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
