@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CleanTemplate.Domain;
 using CleanTemplate.UnitOfWork;
 using FluentValidation.Results;
 using System;
@@ -48,6 +49,23 @@ namespace CleanTemplate.Application.UseCases
                 );
             }
             return resultList;
+        }
+
+        protected IEnumerable<UseCasePersistenceAssociation<TRequest, TDomain>> CreateDomainEntityPersistenceAssociation<TRequest,TDomain>(List<TRequest> requests, IModelValidator<TRequest> validator) where TDomain: IDomainModel
+        {
+            var returnList = new List<UseCasePersistenceAssociation<TRequest, TDomain>>();
+            foreach(var request in requests)
+            {
+                var domainModel = _mapper.Map<TDomain>(request);
+                returnList.Add(
+                    new UseCasePersistenceAssociation<TRequest, TDomain>(
+                        request,
+                        domainModel,
+                        validator
+                    )
+                );
+            }
+            return returnList;
         }
     }
 }

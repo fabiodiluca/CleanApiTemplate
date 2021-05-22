@@ -9,8 +9,8 @@ namespace CleanTemplate.Api
     {
         IActionResult ActionResult { get; }
 
-        void Handler(IEnumerable<UseCaseResultMessageBase> responses);
-        void Handler(UseCaseResultMessageBase response);
+        void Handle(IEnumerable<UseCaseResultMessageBase> responses);
+        void Handle(UseCaseResultMessageBase response);
         void Handler(Exception exception, bool outputExceptionDetailsToResponse);
     }
 }

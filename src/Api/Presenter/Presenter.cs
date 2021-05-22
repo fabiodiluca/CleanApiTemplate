@@ -27,7 +27,7 @@ namespace CleanTemplate.Api
             contentResult.Content = JsonConvert.SerializeObject(invalidResult);
         }
 
-        public void Handler(UseCaseResultMessageBase response)
+        public void Handle(UseCaseResultMessageBase response)
         {
             var contentResult = ActionResult as ContentResult;
             if (!response.AnyErrors())
@@ -46,7 +46,7 @@ namespace CleanTemplate.Api
         /// If all user cases were unsuccessful it returns HttpStatusCode.BadRequest
         /// </summary>
         /// <param name="responses"></param>
-        public void Handler(IEnumerable<UseCaseResultMessageBase> responses)
+        public void Handle(IEnumerable<UseCaseResultMessageBase> responses)
         {
             var areAllInvalid = responses.Where(w => w.AnyErrors()).Count() == responses.Count();
             object responseMessage = new { errors = responses.Select(x => x.Errors) };

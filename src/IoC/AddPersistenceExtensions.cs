@@ -1,4 +1,6 @@
 ﻿using CleanTemplate.Api.Settings.Persistence;
+using CleanTemplate.Application;
+using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanTemplate.IoC
@@ -18,6 +20,11 @@ namespace CleanTemplate.IoC
                 default:
                     throw new System.NotImplementedException($"Persistence '{persistenceSettings.Database}' not implemented yet.");
             }
+
+             services.AddScoped<
+                 IUseCasePersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast>, 
+                 UseCasePersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast>>
+            ();
         }
     }
 }

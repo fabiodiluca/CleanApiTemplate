@@ -34,7 +34,7 @@ namespace CleanTemplate.Api.Controllers
         public IActionResult Get()
         {
             _logger.LogInformation("Getting WeatherForecast");
-            _presenter.Handler(_weatherForeCastUseCase.Get());
+            _presenter.Handle(_weatherForeCastUseCase.Get());
             return _presenter.ActionResult;
         }
 
@@ -45,7 +45,7 @@ namespace CleanTemplate.Api.Controllers
         public IActionResult Post([FromBody] WeatherForecastPostRequest[] models)
         {
             _logger.LogInformation("Posted WeatherForecast");
-            _presenter.Handler(_weatherForeCastUseCase.Post(models));
+            _presenter.Handle(_weatherForeCastUseCase.Post(models));
             return _presenter.ActionResult;
         }
     }
