@@ -33,7 +33,7 @@ namespace CleanTemplate.Data.Repositories.NHibernate
         {
 
             return _mapper.Map<WeatherForeCast>(
-                _session.QueryOver<WeatherForeCastDataModel>().Where(x => x.Id == id).List()
+                _session.QueryOver<WeatherForeCastDataModel>().Where(x => x.Id == id).List().First()
             );
         }
 

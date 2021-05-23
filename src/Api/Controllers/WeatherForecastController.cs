@@ -4,7 +4,6 @@ using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Get;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Net;
 
 namespace CleanTemplate.Api.Controllers
@@ -31,10 +30,10 @@ namespace CleanTemplate.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(UseCaseResult<WeatherForecastGetResponse[]>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.InternalServerError)]
-        public IActionResult Get()
+        public IActionResult Get(int? Id)
         {
             _logger.LogInformation("Getting WeatherForecast");
-            _presenter.Handle(_weatherForeCastUseCase.Get());
+            _presenter.Handle(_weatherForeCastUseCase.Get(Id));
             return _presenter.ActionResult;
         }
 

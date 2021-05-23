@@ -28,7 +28,7 @@ namespace CleanTemplate.Api.Filters
         {
             if (context.Exception != null)
             {
-                _logger.LogError(context.Exception, "Unexpected exception.");
+                _logger.LogError(context.Exception, "Not treated exception.");
                 _presenter.Handler(context.Exception, _environment.IsDevelopment());
                 context.Result = _presenter.ActionResult;
                 context.ExceptionHandled = true;

@@ -30,9 +30,13 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             _persistenceContext = persistenceContext;
         }
 
-        public UseCaseResult<WeatherForecastGetResponse[]> Get()
+        public UseCaseResult<WeatherForecastGetResponse[]> Get(int? id)
         {
-            var list = _repository.Select();
+            List<WeatherForeCast> list;
+            if (id.HasValue) 
+                list = new List<WeatherForeCast> { _repository.Select(id.Value) };
+            else
+                list = _repository.Select();
             var data = _mapper.Map<WeatherForecastGetResponse[]>(list);
 
             return new UseCaseResult<WeatherForecastGetResponse[]>(data);

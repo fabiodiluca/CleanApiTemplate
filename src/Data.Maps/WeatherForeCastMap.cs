@@ -18,7 +18,7 @@ namespace CleanTemplate.Data.Maps
         {
             Table("WeatherForeCast");
 
-            Id(x => x.Id, "Id");
+            Id(x => x.Id, "Id").GeneratedBy.Identity();
             Map(x => x.Date, "Date");
             Map(x => x.TemperatureC, "TemperatureC");
             Map(x => x.Summary, "Summary");
