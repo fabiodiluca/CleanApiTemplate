@@ -11,6 +11,6 @@ namespace CleanTemplate.Api
 
         void Handle(IEnumerable<UseCaseResultMessageBase> responses);
         void Handle(UseCaseResultMessageBase response);
-        void Handler(Exception exception, bool outputExceptionDetailsToResponse);
+        void Handle(Exception exception, bool outputExceptionDetailsToResponse);
     }
 }

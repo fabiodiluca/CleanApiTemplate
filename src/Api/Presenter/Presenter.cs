@@ -10,7 +10,10 @@ using System.Net;
 
 namespace CleanTemplate.Api
 {
-    public class Presenter : IOutputPort<UseCaseResultMessageBase>, IOutputPort<IEnumerable<UseCaseResultMessageBase>>, IPresenter
+    public class Presenter : 
+        IOutputPort<UseCaseResultMessageBase>, 
+        IOutputPort<IEnumerable<UseCaseResultMessageBase>>, 
+        IPresenter
     {
         private IActionResult _ActionResult;
         public IActionResult ActionResult { get { return _ActionResult; } }
@@ -19,14 +22,6 @@ namespace CleanTemplate.Api
         {
             _ActionResult = new ContentResult();
         }
-
-        public void Handler(UseCaseInvalidResult invalidResult)
-        {
-            var contentResult = ActionResult as ContentResult;
-            contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
-            contentResult.Content = JsonConvert.SerializeObject(invalidResult);
-        }
-
         public void Handle(UseCaseResultMessageBase response)
         {
             var contentResult = ActionResult as ContentResult;
@@ -56,14 +51,14 @@ namespace CleanTemplate.Api
             contentResult.Content = JsonConvert.SerializeObject(responses);
         }
 
-        public void Handler(Exception exception, bool outputExceptionDetailsToResponse)
+        public void Handle(Exception exception, bool outputExceptionDetailsToResponse)
         {
             var contentResult = ActionResult as ContentResult;
             contentResult.StatusCode = (int)HttpStatusCode.InternalServerError;
             var response = new UseCaseResult<bool>(
                 new NotificationError(
                     -1,
-                    $"Unexcepcted exception.\r\n{(outputExceptionDetailsToResponse?exception:"")}"
+                    $"Not treated exception.\r\n{(outputExceptionDetailsToResponse?exception:"")}"
                 )
             );
             contentResult.Content = JsonConvert.SerializeObject(response);

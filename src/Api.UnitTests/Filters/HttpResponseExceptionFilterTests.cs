@@ -22,7 +22,7 @@ namespace Api.Tests.Filters
 {
     public class HttpResponseExceptionFilterTests
     {
-        HttpResponseExceptionFilter _httpResponseExceptionFilter;
+        HttpResponseExceptionFilter httpResponseExceptionFilter;
         Mock<ILogger<HttpResponseExceptionFilter>> log;
 
         [SetUp]
@@ -34,7 +34,7 @@ namespace Api.Tests.Filters
 
             log = new Mock<ILogger<HttpResponseExceptionFilter>>();
 
-            _httpResponseExceptionFilter = new HttpResponseExceptionFilter(
+            httpResponseExceptionFilter = new HttpResponseExceptionFilter(
                   _SetupPresenterMock().Object
                 , webHostingEnvironmentMock.Object
                 , log.Object
@@ -91,7 +91,7 @@ namespace Api.Tests.Filters
                     actionExecutedContextResult = value;
             });
 
-            _httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
+            httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
 
             var contentResult = actionExecutedContextResult as ContentResult;
             var useCaseResponse = JsonConvert.DeserializeObject<UseCaseResult<string>>(contentResult.Content);
@@ -110,7 +110,7 @@ namespace Api.Tests.Filters
                 actionExecutedContextExceptionHandled = value;
             });
 
-            _httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
+            httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
 
             Assert.AreEqual(true, actionExecutedContextExceptionHandled);
         }
@@ -120,7 +120,7 @@ namespace Api.Tests.Filters
         {
             var actionExecutedContextMock = _SetupActionExecutedContextMock();
 
-            _httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
+            httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
 
             Func<object, Type, bool> state = (v, t) => true;
             log.Verify(x => x.Log(
