@@ -11,7 +11,7 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast.Profiles
         {
             CreateMap<WeatherForeCast, WeatherForecastGetResponse>();
             CreateMap<WeatherForecastPostRequest, WeatherForeCast>();
-
+            CreateMap<WeatherForeCast, WeatherForecastPostResponse>();
         }
     }
 }

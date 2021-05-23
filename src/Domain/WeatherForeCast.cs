@@ -4,6 +4,7 @@ namespace CleanTemplate.Domain
 {
     public class WeatherForeCast : IDomainModel
     {
+        public int Id { get; set; }
         public DateTime Date { get; set; }
 
         public int TemperatureC { get; set; }

@@ -39,7 +39,7 @@ namespace CleanTemplate.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(UseCaseResult<WeatherForecastGetResponse[]>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UseCaseResult<WeatherForecastPostResponse[]>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.InternalServerError)]
         public IActionResult Post([FromBody] WeatherForecastPostRequest[] models)

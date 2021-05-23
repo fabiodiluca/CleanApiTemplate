@@ -2,9 +2,9 @@
 using CleanTemplate.Application.Repositories;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Get;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
+using CleanTemplate.Domain;
 using CleanTemplate.UnitOfWork;
-using FluentValidation;
-using FluentValidation.Results;
+using System;
 using System.Collections.Generic;
 
 namespace CleanTemplate.Application.UseCases.WeatherForecast
@@ -17,13 +17,13 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
         };
 
         protected readonly IWeatherForeCastRepository _repository;
-        protected readonly IUseCasePersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast> _persistenceContext;
+        protected readonly IPersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast, Domain.WeatherForeCast> _persistenceContext;
 
         public WeatherForeCastUseCase(
             IUnitOfWork unitOfWork, 
             IMapper mapper, 
             IWeatherForeCastRepository repository,
-            IUseCasePersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast> persistenceContext)
+            IPersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast, Domain.WeatherForeCast> persistenceContext)
             :base(unitOfWork, mapper)
         {
             _repository = repository;
@@ -38,30 +38,22 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             return new UseCaseResult<WeatherForecastGetResponse[]>(data);
         }
 
-        public UseCaseResult<WeatherForecastGetResponse>[] Post(WeatherForecastPostRequest[] models)
+        public UseCaseResult<WeatherForecastPostResponse>[] Post(WeatherForecastPostRequest[] models)
         {
             _persistenceContext.Set(models);
 
             _unitOfWork.BeginTransaction();
 
-            var results = new List<UseCaseResult<WeatherForecastGetResponse>>();
-            foreach(var persistenceAssociation in _persistenceContext.PersistenceAssociations)
-            {
-                UseCaseResult<WeatherForecastGetResponse> result;
-                if (persistenceAssociation.validationResult.IsValid)
-                {
-                    persistenceAssociation.DomainModel = _repository.Insert(persistenceAssociation.DomainModel);
-                    var resultData = _mapper.Map<WeatherForecastGetResponse>(persistenceAssociation.DomainModel);
-                    result = new UseCaseResult<WeatherForecastGetResponse>(resultData);
-                }
-                else
-                    result = new UseCaseResult<WeatherForecastGetResponse>(persistenceAssociation.validationResult);
-                results.Add(result);
-            }
+            var results = PersistAndCreateUseCaseResult(_persistenceContext, 
+                (persistenceAssociation) => {
+                persistenceAssociation.DomainModelOut = _repository.Insert(persistenceAssociation.DomainModelIn);
+                return _mapper.Map<WeatherForecastPostResponse>(persistenceAssociation.DomainModelOut);
+            });
 
             _unitOfWork.Commit();
 
             return results.ToArray();
         }
+
     }
 }

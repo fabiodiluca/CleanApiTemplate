@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using CleanTemplate.Domain;
 using CleanTemplate.UnitOfWork;
-using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
 
@@ -28,44 +27,32 @@ namespace CleanTemplate.Application.UseCases
             _unitOfWork.Commit();
         }
 
-
-        protected UseCaseResult<T> CreateResult<T>()
-        {
-            return Activator.CreateInstance<UseCaseResult<T>>();
-        }
-
         protected List<UseCaseResult<T>> CreateResultList<T>()
         {
             return Activator.CreateInstance<List<UseCaseResult<T>>>();
         }
 
-        protected List<UseCaseResult<T>> CreateResultList<T>(IEnumerable<ValidationResult> validationsResult)
+        protected List<UseCaseResult<TResponse>> PersistAndCreateUseCaseResult<TRequest, TDomainIn, TDomainOut, TResponse>(
+            IPersistenceContext<TRequest, TDomainIn, TDomainOut> persistenceContext,
+            Func<PersistenceAssociation<TRequest, TDomainIn, TDomainOut>, TResponse> itemPersistenceFunction
+            )
+            where TDomainIn : IDomainModel
+            where TDomainOut : IDomainModel
         {
-            var resultList = Activator.CreateInstance<List<UseCaseResult<T>>>();
-            foreach (var validationResult in validationsResult)
+            var results = CreateResultList<TResponse>();
+            foreach (var persistenceAssociation in persistenceContext.PersistenceAssociations)
             {
-                resultList.Add(
-                    (UseCaseResult<T>)Activator.CreateInstance(typeof(UseCaseResult<T>), validationResult)
-                );
+                UseCaseResult<TResponse> result;
+                if (persistenceAssociation.validationResult.IsValid)
+                {
+                    var resultData = itemPersistenceFunction(persistenceAssociation);
+                    result = new UseCaseResult<TResponse>(resultData);
+                }
+                else
+                    result = new UseCaseResult<TResponse>(persistenceAssociation.validationResult);
+                results.Add(result);
             }
-            return resultList;
-        }
-
-        protected IEnumerable<UseCasePersistenceAssociation<TRequest, TDomain>> CreateDomainEntityPersistenceAssociation<TRequest,TDomain>(List<TRequest> requests, IModelValidator<TRequest> validator) where TDomain: IDomainModel
-        {
-            var returnList = new List<UseCasePersistenceAssociation<TRequest, TDomain>>();
-            foreach(var request in requests)
-            {
-                var domainModel = _mapper.Map<TDomain>(request);
-                returnList.Add(
-                    new UseCasePersistenceAssociation<TRequest, TDomain>(
-                        request,
-                        domainModel,
-                        validator
-                    )
-                );
-            }
-            return returnList;
+            return results;
         }
     }
 }

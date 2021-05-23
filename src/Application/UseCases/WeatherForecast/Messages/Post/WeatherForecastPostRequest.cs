@@ -4,6 +4,7 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post
 {
     public class WeatherForecastPostRequest
     {
+        public int? Id { get; set; }
         public DateTime Date { get; set; }
 
         public int TemperatureC { get; set; }

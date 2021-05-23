@@ -1,5 +1,5 @@
 ﻿using CleanTemplate.Api.Settings.Persistence;
-using CleanTemplate.Application;
+using CleanTemplate.Application.UseCases;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,8 +22,8 @@ namespace CleanTemplate.IoC
             }
 
              services.AddScoped<
-                 IUseCasePersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast>, 
-                 UseCasePersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast>>
+                 IPersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast, Domain.WeatherForeCast>, 
+                 PersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast, Domain.WeatherForeCast>>
             ();
         }
     }

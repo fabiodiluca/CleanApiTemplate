@@ -19,4 +19,8 @@
     <ProjectReference Include="..\UnitOfWork\UnitOfWork.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NovaPasta\" />
+  </ItemGroup>
+
 </Project>
