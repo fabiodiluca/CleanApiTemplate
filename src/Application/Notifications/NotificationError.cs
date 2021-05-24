@@ -19,9 +19,8 @@
             var objCompare = obj as NotificationError;
             if (objCompare == null)
                 return false;
-            return  objCompare.Code == Code &&
-                    objCompare.Message == Message &&
-                    objCompare.Type == Type;
+            return objCompare.Code == Code &&
+                   objCompare.Message == Message;
         }
 
         public override int GetHashCode()

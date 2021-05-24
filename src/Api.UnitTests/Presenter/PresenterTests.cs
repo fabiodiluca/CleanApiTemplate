@@ -1,5 +1,4 @@
-﻿using CleanTemplate.Application.Notifications;
-using CleanTemplate.Application.UseCases;
+﻿using CleanTemplate.Application.UseCases;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -43,7 +42,7 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
-        public void SingleResultWithNoErrorsShouldReturnHttpStatusCodeOk()
+        public void HandleSingleResultWithNoErrorsShouldReturnHttpStatusCodeOk()
         {
             presenter.Handle(useCaseResultWithNoErrors);
             var actionResult = presenter.ActionResult;
@@ -52,7 +51,7 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
-        public void SingleResultShouldSerializeDataToJsonObjectDataPropertyOfResponse()
+        public void HandleSingleResultShouldSerializeDataToJsonObjectDataPropertyOfResponse()
         {
             presenter.Handle(useCaseResultWithNoErrors);
             var actionResult = presenter.ActionResult;
@@ -62,7 +61,7 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
-        public void SingleResultWithAnyErrorsShouldReturnHttpStatusCodeBadRequest()
+        public void HandleSingleResultWithAnyErrorsShouldReturnHttpStatusCodeBadRequest()
         {
             presenter.Handle(useCaseResultWithErrors);
             var actionResult = presenter.ActionResult;
@@ -71,7 +70,7 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
-        public void SingleResultShouldSerializeErrorsToJsonObjectErrorsPropertyOfResponse()
+        public void HandleSingleResultShouldSerializeErrorsToJsonObjectErrorsPropertyOfResponse()
         {
             presenter.Handle(useCaseResultWithErrors);
             var actionResult = presenter.ActionResult;
@@ -81,8 +80,41 @@ namespace Api.UnitTests.Presenter
             var errorList = deserializedResult.Errors.ToList();
 
             Assert.AreEqual(expectedErrorsList.Count, errorList.Count);
+
             for (int i = 0; i < expectedErrorsList.Count; i++)
                 Assert.AreEqual(expectedErrorsList[i], errorList[i]);
+        }
+
+        [Test]
+        public void HandleMultipleResultsThatHaveAtLeastOneWithNoErrorsShouldReturnHttpStatusCodeOk()
+        {
+            var useCaseResults = new List<UseCaseResult<Data>>() { useCaseResultWithNoErrors, useCaseResultWithErrors };
+            presenter.Handle(useCaseResults);
+            var actionResult = presenter.ActionResult;
+            var contentResult = actionResult as ContentResult;
+            Assert.AreEqual((int)HttpStatusCode.OK, contentResult.StatusCode);
+        }
+
+        [Test]
+        public void HandleMultipleResultsThatOnlyHaveResultdWithErrorsShouldReturnHttpStatusCodeBadRequest()
+        {
+            var useCaseResults = new List<UseCaseResult<Data>>() { useCaseResultWithNoErrors, useCaseResultWithNoErrors };
+            presenter.Handle(useCaseResults);
+            var actionResult = presenter.ActionResult;
+            var contentResult = actionResult as ContentResult;
+            Assert.AreEqual((int)HttpStatusCode.BadRequest, contentResult.StatusCode);
+        }
+
+        [Test]
+        public void HandleMultipleResultShouldSerializeDataToJsonObjectDataPropertyOfResponse()
+        {
+            var useCaseResults = new List<UseCaseResult<Data>>() { useCaseResultWithNoErrors, useCaseResultWithErrors };
+            presenter.Handle(useCaseResults);
+            var actionResult = presenter.ActionResult;
+            var contentResult = actionResult as ContentResult;
+            var deserializedResults = JsonConvert.DeserializeObject<UseCaseResult<Data>[]>(contentResult.Content);
+            for (int i = 0; i < deserializedResults.Length; i++)
+                Assert.AreEqual(deserializedResults[i].Data, useCaseResults[i].Data);
         }
     }
 }

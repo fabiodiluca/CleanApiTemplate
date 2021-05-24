@@ -22,16 +22,16 @@ namespace CleanTemplate.Application.Notifications
         /// <summary>
         /// 
         /// </summary>
-        public Notification(NotificationType tipo) { }
+        public Notification(NotificationType type) { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="code"></param>
         /// <param name="message"></param>
-        public Notification(NotificationType tipo, int code, string message)
+        public Notification(NotificationType type, int code, string message)
         {
-            this.Type = tipo;
+            this.Type = type;
             this.Code = code;
             this.Message = message;
         }
