@@ -6,6 +6,7 @@ using CleanTemplate.Domain;
 using CleanTemplate.UnitOfWork;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CleanTemplate.Application.UseCases.WeatherForecast
 {
@@ -48,16 +49,33 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
 
             _unitOfWork.BeginTransaction();
 
+            var existingWeatherForecastIds = ExistingWeatherForecastIds(models);
+
             var results = PersistAndCreateUseCaseResult(_persistenceContext, 
                 (persistenceAssociation) => {
-                persistenceAssociation.DomainModelOut = _repository.Insert(persistenceAssociation.DomainModelIn);
-                return _mapper.Map<WeatherForecastPostResponse>(persistenceAssociation.DomainModelOut);
-            });
+                    persistenceAssociation.DomainModelOut = _repository.Insert(persistenceAssociation.DomainModelIn);
+                    return _mapper.Map<WeatherForecastPostResponse>(persistenceAssociation.DomainModelOut);
+                },
+                (persistenceAssociation) => {
+                    return persistenceAssociation.DomainModelIn.Id > 0;
+                },
+                (persistenceAssociation) => {
+                    return existingWeatherForecastIds.Contains(persistenceAssociation.DomainModelIn.Id);
+                });
 
             _unitOfWork.Commit();
 
             return results.ToArray();
         }
 
+        protected List<int> ExistingWeatherForecastIds(WeatherForecastPostRequest[] models)
+        {
+            return _repository.Select(
+                 models
+                     .Where(x => x.Id.HasValue && x.Id > 0)
+                     .Select(y => y.Id.Value)
+                     .ToList()
+             ).Select(x => x.Id).ToList();
+        }
     }
 }

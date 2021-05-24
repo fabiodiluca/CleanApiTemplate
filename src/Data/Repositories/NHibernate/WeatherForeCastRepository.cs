@@ -40,7 +40,9 @@ namespace CleanTemplate.Data.Repositories.NHibernate
         public List<WeatherForeCast> Select(List<int> ids)
         {
             return _mapper.Map<List<WeatherForeCast>>(
-                _session.QueryOver<WeatherForeCastDataModel>().Where(x => ids.Contains(x.Id)).List()
+                _session.QueryOver<WeatherForeCastDataModel>()
+                .AndRestrictionOn(x => x.Id).IsIn(ids)
+                .List()
             );
         }
 

@@ -56,7 +56,7 @@ namespace CleanTemplate.Application.UseCases
             {
                 int ErrorCode;
                 Int32.TryParse(error.ErrorCode, out ErrorCode);
-                var errorResponse = new NotificationError(ErrorCode, error.ErrorMessage);
+                var errorResponse = new NotificationError(ErrorCode, error.ErrorMessage, ErrorCategory.EntityValidation);
                 ErrorsList.Add(errorResponse);
             }
             if (ErrorsList.Any())
@@ -87,7 +87,17 @@ namespace CleanTemplate.Application.UseCases
         /// <returns></returns>
         public bool AnyErrors()
         {
-            return (Errors == null || !Errors.Any());
+            return (Errors != null && !Errors.Any());
+        }
+
+        public bool AnyValidationErrors()
+        {
+            return (Errors != null && !Errors.Where(x => x.Category == ErrorCategory.EntityValidation).Any());
+        }
+
+        public bool AnyNotFoundErrors()
+        {
+            return (Errors != null && !Errors.Where(x => x.Category == ErrorCategory.NotSpecified).Any());
         }
     }
 }

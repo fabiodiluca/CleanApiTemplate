@@ -98,7 +98,7 @@ namespace Api.UnitTests.Presenter
         [Test]
         public void HandleMultipleResultsThatOnlyHaveResultdWithErrorsShouldReturnHttpStatusCodeBadRequest()
         {
-            var useCaseResults = new List<UseCaseResult<Data>>() { useCaseResultWithNoErrors, useCaseResultWithNoErrors };
+            var useCaseResults = new List<UseCaseResult<Data>>() { useCaseResultWithErrors, useCaseResultWithErrors };
             presenter.Handle(useCaseResults);
             var actionResult = presenter.ActionResult;
             var contentResult = actionResult as ContentResult;

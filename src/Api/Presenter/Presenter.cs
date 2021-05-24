@@ -25,7 +25,11 @@ namespace CleanTemplate.Api
         public void Handle(UseCaseResultMessageBase response)
         {
             var contentResult = ActionResult as ContentResult;
-            if (!response.AnyErrors())
+            if (response.AnyValidationErrors())
+            {
+                contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
+            } 
+            else if (response.AnyNotFoundErrors()) 
             {
                 contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
             }
@@ -37,17 +41,30 @@ namespace CleanTemplate.Api
         }
 
         /// <summary>
-        /// It at least one user case response was successful it returns HttpStatusCode.OK
+        /// It at least one user case response was successful (not containing Validation or NotFound errors) it returns HttpStatusCode.OK
         /// If all user cases were unsuccessful it returns HttpStatusCode.BadRequest
         /// </summary>
         /// <param name="responses"></param>
         public void Handle(IEnumerable<UseCaseResultMessageBase> responses)
         {
-            var areAllInvalid = responses.Where(w => w.AnyErrors()).Count() == responses.Count();
+            var areAllInvalid = responses.Where(w => w.AnyValidationErrors()).Count() == responses.Count();
             object responseMessage = new { errors = responses.Select(x => x.Errors) };
 
+            var areAllNotFound = responses.Where(w => w.AnyNotFoundErrors()).Count() == responses.Count();
+
             var contentResult = ActionResult as ContentResult;
-            contentResult.StatusCode = areAllInvalid ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
+            if (areAllInvalid)
+            {
+                contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
+            }
+            else if (areAllNotFound)
+            {
+                contentResult.StatusCode = (int)HttpStatusCode.NotFound;
+            }
+            else
+            {
+                contentResult.StatusCode = (int)HttpStatusCode.OK;
+            }
             contentResult.Content = JsonConvert.SerializeObject(responses);
         }
 

@@ -1,18 +1,44 @@
-﻿namespace CleanTemplate.Application.Notifications
+﻿using Newtonsoft.Json;
+
+namespace CleanTemplate.Application.Notifications
 {
     public class NotificationError : Notification
     {
         /// <summary>
         /// 
         /// </summary>
-        public NotificationError() : base(NotificationType.Error) { }
+        [JsonIgnore]
+        public ErrorCategory Category { get; protected set; }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public NotificationError()
+            : base(NotificationType.Error)
+        {
+            Category = ErrorCategory.NotSpecified;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public NotificationError(ErrorCategory category) 
+            : base(NotificationType.Error) 
+        {
+            Category = category;
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="code"></param>
         /// <param name="message"></param>
-        public NotificationError(int code, string message) : base(NotificationType.Error, code, message) { }
+        public NotificationError(int code, string message, ErrorCategory category = ErrorCategory.NotSpecified) 
+            : base(NotificationType.Error, code, message) 
+        {
+            Category = category;
+        }
 
         public override bool Equals(object obj)
         {

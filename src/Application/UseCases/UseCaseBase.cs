@@ -34,7 +34,9 @@ namespace CleanTemplate.Application.UseCases
 
         protected List<UseCaseResult<TResponse>> PersistAndCreateUseCaseResult<TRequest, TDomainIn, TDomainOut, TResponse>(
             IPersistenceContext<TRequest, TDomainIn, TDomainOut> persistenceContext,
-            Func<PersistenceAssociation<TRequest, TDomainIn, TDomainOut>, TResponse> itemPersistenceFunction
+            Func<PersistenceAssociation<TRequest, TDomainIn, TDomainOut>, TResponse> itemPersistenceFunction,
+            Func<PersistenceAssociation<TRequest, TDomainIn, TDomainOut>, bool> shoudAlreadyBePersistedDomainInFunction,
+            Func<PersistenceAssociation<TRequest, TDomainIn, TDomainOut>, bool> alreadyPersistedDomainInFunction
             )
             where TDomainIn : IDomainModel
             where TDomainOut : IDomainModel
@@ -45,12 +47,26 @@ namespace CleanTemplate.Application.UseCases
                 UseCaseResult<TResponse> result;
                 if (persistenceAssociation.validationResult.IsValid)
                 {
+                    if (shoudAlreadyBePersistedDomainInFunction(persistenceAssociation) &&
+                        !alreadyPersistedDomainInFunction(persistenceAssociation))
+                    {
+                        result = new UseCaseResult<TResponse>(
+                            new Notifications.NotificationError(-1, "Specified id does not exist.", ErrorCategory.EntityNotFound)
+                        );
+                        results.Add(result);
+                        break;
+                    }
                     var resultData = itemPersistenceFunction(persistenceAssociation);
                     result = new UseCaseResult<TResponse>(resultData);
+                    results.Add(result);
+                    break;
                 }
                 else
+                {
                     result = new UseCaseResult<TResponse>(persistenceAssociation.validationResult);
-                results.Add(result);
+                    results.Add(result);
+                    break;
+                }
             }
             return results;
         }
