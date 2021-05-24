@@ -13,13 +13,13 @@ namespace CleanTemplate.Application.UseCases
         /// 
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<NotificationError> Errors { get; internal set; }
+        public IEnumerable<NotificationError> Errors { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<NotificationWarning> Warnings { get; internal set; }
+        public IEnumerable<NotificationWarning> Warnings { get; set; }
 
         /// <summary>
         /// 

@@ -1,7 +1,9 @@
-﻿using CleanTemplate.Application.UseCases;
+﻿using CleanTemplate.Application.Notifications;
+using CleanTemplate.Application.UseCases;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Api.UnitTests.Presenter
@@ -41,16 +43,6 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
-        public void SingleResultShouldSerializeContentToJsonToDataPropertyOfResponse()
-        {
-            presenter.Handle(useCaseResultWithNoErrors);
-            var actionResult = presenter.ActionResult;
-            var contentResult = actionResult as ContentResult;
-            var deserializedResult = JsonConvert.DeserializeObject<UseCaseResult<Data>>(contentResult.Content);
-            Assert.AreEqual(true, useCaseResultWithNoErrors.Data.Equals(deserializedResult.Data));
-        }
-
-        [Test]
         public void SingleResultWithNoErrorsShouldReturnHttpStatusCodeOk()
         {
             presenter.Handle(useCaseResultWithNoErrors);
@@ -60,12 +52,37 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
+        public void SingleResultShouldSerializeDataToJsonObjectDataPropertyOfResponse()
+        {
+            presenter.Handle(useCaseResultWithNoErrors);
+            var actionResult = presenter.ActionResult;
+            var contentResult = actionResult as ContentResult;
+            var deserializedResult = JsonConvert.DeserializeObject<UseCaseResult<Data>>(contentResult.Content);
+            Assert.AreEqual(true, useCaseResultWithNoErrors.Data.Equals(deserializedResult.Data));
+        }
+
+        [Test]
         public void SingleResultWithAnyErrorsShouldReturnHttpStatusCodeBadRequest()
         {
             presenter.Handle(useCaseResultWithErrors);
             var actionResult = presenter.ActionResult;
             var contentResult = actionResult as ContentResult;
             Assert.AreEqual((int)HttpStatusCode.BadRequest, contentResult.StatusCode);
+        }
+
+        [Test]
+        public void SingleResultShouldSerializeErrorsToJsonObjectErrorsPropertyOfResponse()
+        {
+            presenter.Handle(useCaseResultWithErrors);
+            var actionResult = presenter.ActionResult;
+            var contentResult = actionResult as ContentResult;
+            var deserializedResult = JsonConvert.DeserializeObject<UseCaseResult<Data>>(contentResult.Content);
+            var expectedErrorsList = useCaseResultWithErrors.Errors.ToList();
+            var errorList = deserializedResult.Errors.ToList();
+
+            Assert.AreEqual(expectedErrorsList.Count, errorList.Count);
+            for (int i = 0; i < expectedErrorsList.Count; i++)
+                Assert.AreEqual(expectedErrorsList[i], errorList[i]);
         }
     }
 }
