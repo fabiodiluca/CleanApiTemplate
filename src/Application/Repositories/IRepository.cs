@@ -12,7 +12,9 @@ namespace CleanTemplate.Application.Repositories
         bool Exists(int id);
         bool ExistAll(List<int> ids);
         T Insert(T model);
+        T InsertOrUpdate(T model);
         List<T> Insert(List<T> model);
+        List<T> InsertOrUpdate(List<T> model);
         T Update(T model);
         List<T> Update(List<T> model);
         void Delete(T model);

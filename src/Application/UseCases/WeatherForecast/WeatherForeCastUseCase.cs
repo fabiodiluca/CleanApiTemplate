@@ -53,7 +53,7 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
 
             var results = PersistAndCreateUseCaseResult(_persistenceContext, 
                 (persistenceAssociation) => {
-                    persistenceAssociation.DomainModelOut = _repository.Insert(persistenceAssociation.DomainModelIn);
+                    persistenceAssociation.DomainModelOut = _repository.InsertOrUpdate(persistenceAssociation.DomainModelIn);
                     return _mapper.Map<WeatherForecastPostResponse>(persistenceAssociation.DomainModelOut);
                 },
                 (persistenceAssociation) => {

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using CleanTemplate.Data.Model;
 using CleanTemplate.Application.Repositories;
+using CleanTemplate.Data.Model;
 using CleanTemplate.Domain;
+using CleanTemplate.UnitOfWork;
 using NHibernate;
 using System.Collections.Generic;
-using CleanTemplate.UnitOfWork;
 using System.Linq;
 
 namespace CleanTemplate.Data.Repositories.NHibernate
@@ -53,16 +53,17 @@ namespace CleanTemplate.Data.Repositories.NHibernate
             return _mapper.Map<WeatherForeCast>(dataModel);
         }
 
-        public void Delete(WeatherForeCast domainModel)
-        {
-            var dataModel = _mapper.Map<WeatherForeCastDataModel>(domainModel);
-            _session.Delete(dataModel);
-        }
-
         public WeatherForeCast Update(WeatherForeCast model)
         {
             var dataModel = _mapper.Map<WeatherForeCastDataModel>(model);
             _session.Update(dataModel);
+            return _mapper.Map<WeatherForeCast>(dataModel);
+        }
+
+        public WeatherForeCast InsertOrUpdate(WeatherForeCast model)
+        {
+            var dataModel = _mapper.Map<WeatherForeCastDataModel>(model);
+            _session.SaveOrUpdate(dataModel);
             return _mapper.Map<WeatherForeCast>(dataModel);
         }
 
@@ -74,24 +75,46 @@ namespace CleanTemplate.Data.Repositories.NHibernate
             return returnList;
         }
 
-        public List<WeatherForeCast> Update(List<WeatherForeCast> model)
+        public List<WeatherForeCast> Update(List<WeatherForeCast> models)
         {
-            throw new System.NotImplementedException();
+            var returnList = new List<WeatherForeCast>();
+            foreach (var model in models)
+                returnList.Add(Update(model));
+            return returnList;
         }
 
-        public void Delete(List<WeatherForeCast> model)
+
+        public List<WeatherForeCast> InsertOrUpdate(List<WeatherForeCast> models)
         {
-            throw new System.NotImplementedException();
+            var returnList = new List<WeatherForeCast>();
+            foreach (var model in models)
+                returnList.Add(InsertOrUpdate(model));
+            return returnList;
+        }
+
+        public void Delete(WeatherForeCast domainModel)
+        {
+            var dataModel = _mapper.Map<WeatherForeCastDataModel>(domainModel);
+            _session.Delete(dataModel);
+        }
+
+        public void Delete(List<WeatherForeCast> models)
+        {
+            foreach (var model in models)
+                Delete(model);
         }
 
         public void Delete(int id)
         {
-            throw new System.NotImplementedException();
+            _session.Delete(
+                _session.Query<WeatherForeCast>().Where(x => x.Id == id).First()
+            );
         }
 
-        public void Delete(List<int> id)
+        public void Delete(List<int> ids)
         {
-            throw new System.NotImplementedException();
+            foreach(var id in ids)
+                Delete(id);
         }
 
         public bool Exists(int id)
