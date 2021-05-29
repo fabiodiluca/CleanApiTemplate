@@ -59,7 +59,7 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
                 (persistenceAssociation) => {
                     return persistenceAssociation.DomainModelIn.Id > 0;
                 },
-                (persistenceAssociation) => {
+                (persistenceAssociation) => { 
                     return existingWeatherForecastIds.Contains(persistenceAssociation.DomainModelIn.Id);
                 });
 

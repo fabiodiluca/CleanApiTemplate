@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CleanTemplate.Application.Repositories;
+using CleanTemplate.Application.Repositories.Exceptions;
 using CleanTemplate.Data.Model;
 using CleanTemplate.Domain;
 using CleanTemplate.UnitOfWork;
@@ -29,12 +30,18 @@ namespace CleanTemplate.Data.Repositories.NHibernate
             );
         }
 
+        /// <summary>
+        /// throws EntityNotFoundException
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public WeatherForeCast Select(int id)
         {
+            var model = _session.QueryOver<WeatherForeCastDataModel>().Where(x => x.Id == id).List().FirstOrDefault();
+            if (model == null)
+                throw new EntityNotFoundException();
 
-            return _mapper.Map<WeatherForeCast>(
-                _session.QueryOver<WeatherForeCastDataModel>().Where(x => x.Id == id).List().First()
-            );
+            return _mapper.Map<WeatherForeCast>(model);
         }
 
         public List<WeatherForeCast> Select(List<int> ids)
@@ -104,13 +111,22 @@ namespace CleanTemplate.Data.Repositories.NHibernate
                 Delete(model);
         }
 
+        /// <summary>
+        /// throws EntityNotFoundException
+        /// </summary>
+        /// <param name="id"></param>
         public void Delete(int id)
         {
-            _session.Delete(
-                _session.Query<WeatherForeCast>().Where(x => x.Id == id).First()
-            );
+            var model = _session.Query<WeatherForeCast>().Where(x => x.Id == id).FirstOrDefault();
+            if (model == null)
+                throw new EntityNotFoundException();
+            _session.Delete(model);
         }
 
+        /// <summary>
+        /// throws EntityNotFoundException if any id does not exist
+        /// </summary>
+        /// <param name="ids"></param>
         public void Delete(List<int> ids)
         {
             foreach(var id in ids)

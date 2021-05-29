@@ -7,6 +7,11 @@ namespace CleanTemplate.Application.Repositories
         where T : IDomainModel
     {
         List<T> Select();
+        /// <summary>
+        /// throws EntityNotFoundException
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         T Select(int id);
         List<T> Select(List<int> ids);
         bool Exists(int id);
@@ -19,7 +24,15 @@ namespace CleanTemplate.Application.Repositories
         List<T> Update(List<T> model);
         void Delete(T model);
         void Delete(List<T> model);
+        /// <summary>
+        /// throws EntityNotFoundException
+        /// </summary>
+        /// <param name="id"></param>
         void Delete(int id);
+        /// <summary>
+        /// throws EntityNotFoundException
+        /// </summary>
+        /// <param name="id"></param>
         void Delete(List<int> id);
     }
 }
