@@ -53,5 +53,10 @@ namespace CleanTemplate.Application.Notifications
         {
             return base.GetHashCode();
         }
+
+        public static NotificationError SpecifiedIdDoesNotExist()
+        {
+            return new NotificationError(-1, "Specified id does not exist.", ErrorCategory.EntityNotFound);
+        }
     }
 }

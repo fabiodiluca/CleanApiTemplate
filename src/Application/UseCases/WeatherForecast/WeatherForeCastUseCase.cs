@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using CleanTemplate.Application.Repositories;
+using CleanTemplate.Application.Repositories.Exceptions;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Get;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
 using CleanTemplate.Domain;
 using CleanTemplate.UnitOfWork;
-using System;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,38 +13,66 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
 {
     public class WeatherForeCastUseCase : UseCaseBase, IWeatherForeCastUseCase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
+        private readonly ILogger<WeatherForeCastUseCase> _logger;
         protected readonly IWeatherForeCastRepository _repository;
-        protected readonly IPersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast, Domain.WeatherForeCast> _persistenceContext;
+        protected readonly IPersistenceContext<WeatherForecastPostRequest, WeatherForeCast, WeatherForeCast> _persistenceContext;
 
         public WeatherForeCastUseCase(
+            ILogger<WeatherForeCastUseCase> logger,
             IUnitOfWork unitOfWork, 
             IMapper mapper, 
             IWeatherForeCastRepository repository,
-            IPersistenceContext<WeatherForecastPostRequest, Domain.WeatherForeCast, Domain.WeatherForeCast> persistenceContext)
+            IPersistenceContext<WeatherForecastPostRequest, WeatherForeCast, WeatherForeCast> persistenceContext)
             :base(unitOfWork, mapper)
         {
+            _logger = logger;
             _repository = repository;
             _persistenceContext = persistenceContext;
         }
 
-        public UseCaseResult<WeatherForecastGetResponse[]> Get(int? id)
+        public UseCaseResult<WeatherForecastGetResponse>[] Get(int? id)
         {
-            List<WeatherForeCast> list;
-            if (id.HasValue) 
-                list = new List<WeatherForeCast> { _repository.Select(id.Value) };
+            var results = CreateResultList<WeatherForecastGetResponse>();
+            if (id.HasValue)
+            {
+                try
+                {
+                    var weatherForeCast = _repository.Select(id.Value);
+                    var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
+                    _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
+                    results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
+                }
+                catch (EntityNotFoundException)
+                {
+                    _logger.LogDebug("Adicionando resultado EntityNotFoundException para id {id}", id);
+                    results.Add(new UseCaseResult<WeatherForecastGetResponse>(
+                        Notifications.NotificationError.SpecifiedIdDoesNotExist())
+                    );
+                }
+            }
             else
-                list = _repository.Select();
-            var data = _mapper.Map<WeatherForecastGetResponse[]>(list);
+            {
+                return Get();
+            }
 
-            return new UseCaseResult<WeatherForecastGetResponse[]>(data);
+            return results.ToArray();
         }
 
-        public UseCaseResult<WeatherForecastPostResponse>[] Post(WeatherForecastPostRequest[] models)
+        public UseCaseResult<WeatherForecastGetResponse>[] Get()
+        {
+            var results = CreateResultList<WeatherForecastGetResponse>();
+
+            var list = _repository.Select();
+            foreach (var weatherForeCast in list)
+            {
+                _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
+                var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
+                results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
+            }
+            return results.ToArray();
+        }
+
+            public UseCaseResult<WeatherForecastPostResponse>[] Post(WeatherForecastPostRequest[] models)
         {
             _persistenceContext.Set(models);
 
@@ -68,7 +97,7 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             return results.ToArray();
         }
 
-        protected List<int> ExistingWeatherForecastIds(WeatherForecastPostRequest[] models)
+        private List<int> ExistingWeatherForecastIds(WeatherForecastPostRequest[] models)
         {
             return _repository.Select(
                  models

@@ -51,7 +51,7 @@ namespace CleanTemplate.Application.UseCases
                         !IsAlreadyPersistedDomainInFunction(persistenceAssociation))
                     {
                         result = new UseCaseResult<TResponse>(
-                            new Notifications.NotificationError(-1, "Specified id does not exist.", ErrorCategory.EntityNotFound)
+                            Notifications.NotificationError.SpecifiedIdDoesNotExist()
                         );
                         results.Add(result);
                         break;
