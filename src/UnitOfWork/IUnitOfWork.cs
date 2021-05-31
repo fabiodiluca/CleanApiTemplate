@@ -18,5 +18,6 @@ namespace CleanTemplate.UnitOfWork
         void Commit(bool startNewSession, bool startNewTransaction);
         void RollbackTransaction();
         void NewSession();
+        void ClearSession();
     }
 }

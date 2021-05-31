@@ -119,5 +119,10 @@ namespace CleanTemplate.UnitOfWork.NHibernateImplementation
             if (startNewTransaction)
                 _transaction = _Session.BeginTransaction();
         }
+
+        public void ClearSession()
+        {
+            _Session.Clear();
+        }
     }
 }

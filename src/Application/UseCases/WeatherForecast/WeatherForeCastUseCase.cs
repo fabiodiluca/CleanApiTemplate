@@ -66,9 +66,10 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
         {
             _persistenceContext.Set(models);
 
-            _unitOfWork.BeginTransaction();
-
             var existingWeatherForecastIds = ExistingWeatherForecastIds(models);
+
+            _unitOfWork.ClearSession();
+            _unitOfWork.BeginTransaction();
 
             var results = PersistAndCreateUseCaseResult(_persistenceContext, 
                 (persistenceAssociation) => {
