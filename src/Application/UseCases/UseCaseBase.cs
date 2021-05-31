@@ -50,10 +50,7 @@ namespace CleanTemplate.Application.UseCases
                     if (mustAlreadyBePersistedDomainInFunction(persistenceAssociation) &&
                         !IsAlreadyPersistedDomainInFunction(persistenceAssociation))
                     {
-                        result = new UseCaseResult<TResponse>(
-                            Notifications.NotificationError.SpecifiedIdDoesNotExist()
-                        );
-                        results.Add(result);
+                        results.AddSpecifiedIdDoesNotExist();
                         break;
                     }
                     var resultData = persistenceFunction(persistenceAssociation);

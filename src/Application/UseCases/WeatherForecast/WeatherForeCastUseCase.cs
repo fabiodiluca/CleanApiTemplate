@@ -30,34 +30,6 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             _persistenceContext = persistenceContext;
         }
 
-        public UseCaseResult<WeatherForecastGetResponse>[] Get(int? id)
-        {
-            var results = CreateResultList<WeatherForecastGetResponse>();
-            if (id.HasValue)
-            {
-                try
-                {
-                    var weatherForeCast = _repository.Select(id.Value);
-                    var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
-                    _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
-                    results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
-                }
-                catch (EntityNotFoundException)
-                {
-                    _logger.LogDebug("Adicionando resultado EntityNotFoundException para id {id}", id);
-                    results.Add(new UseCaseResult<WeatherForecastGetResponse>(
-                        Notifications.NotificationError.SpecifiedIdDoesNotExist())
-                    );
-                }
-            }
-            else
-            {
-                return Get();
-            }
-
-            return results.ToArray();
-        }
-
         public UseCaseResult<WeatherForecastGetResponse>[] Get()
         {
             var results = CreateResultList<WeatherForecastGetResponse>();
@@ -72,7 +44,25 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             return results.ToArray();
         }
 
-            public UseCaseResult<WeatherForecastPostResponse>[] Post(WeatherForecastPostRequest[] models)
+        public UseCaseResult<WeatherForecastGetResponse>[] Get(int id)
+        {
+            var results = CreateResultList<WeatherForecastGetResponse>();
+            try
+            {
+                var weatherForeCast = _repository.Select(id);
+                var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
+                _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
+                results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
+            }
+            catch (EntityNotFoundException)
+            {
+                _logger.LogDebug("Adicionando resultado EntityNotFoundException para id {id}", id);
+                results.AddSpecifiedIdDoesNotExist();
+            }
+            return results.ToArray();
+        }
+
+        public UseCaseResult<WeatherForecastPostResponse>[] Post(WeatherForecastPostRequest[] models)
         {
             _persistenceContext.Set(models);
 

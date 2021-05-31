@@ -5,7 +5,8 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
 {
     public interface IWeatherForeCastUseCase: IUseCaseBase
     {
-        UseCaseResult<WeatherForecastGetResponse>[] Get(int? id);
+        UseCaseResult<WeatherForecastGetResponse>[] Get();
+        UseCaseResult<WeatherForecastGetResponse>[] Get(int id);
         UseCaseResult<WeatherForecastPostResponse>[] Post(WeatherForecastPostRequest[] models);
     }
 }

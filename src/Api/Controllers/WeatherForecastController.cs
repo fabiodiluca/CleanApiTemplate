@@ -33,7 +33,10 @@ namespace CleanTemplate.Api.Controllers
         public IActionResult Get(int? Id)
         {
             _logger.LogInformation("Getting WeatherForecast");
-            _presenter.Handle(_weatherForeCastUseCase.Get(Id));
+            if (Id.HasValue)
+                _presenter.Handle(_weatherForeCastUseCase.Get(Id.Value));
+            else
+                _presenter.Handle(_weatherForeCastUseCase.Get());
             return _presenter.ActionResult;
         }
 
