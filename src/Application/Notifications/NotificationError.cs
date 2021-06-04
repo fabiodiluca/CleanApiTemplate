@@ -34,7 +34,10 @@ namespace CleanTemplate.Application.Notifications
         /// </summary>
         /// <param name="code"></param>
         /// <param name="message"></param>
-        public NotificationError(int code, string message, ErrorCategory category = ErrorCategory.NotSpecified) 
+        public NotificationError(
+            int code, 
+            string message, 
+            ErrorCategory category = ErrorCategory.NotSpecified) 
             : base(NotificationType.Error, code, message) 
         {
             Category = category;

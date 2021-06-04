@@ -119,7 +119,7 @@ namespace CleanTemplate.Data.Repositories.NHibernate
         /// <param name="id"></param>
         public void Delete(int id)
         {
-            var model = _session.Query<WeatherForeCast>().Where(x => x.Id == id).FirstOrDefault();
+            var model = _session.Query<WeatherForeCastDataModel>().Where(x => x.Id == id).FirstOrDefault();
             if (model == null)
                 throw new EntityNotFoundException();
             _session.Delete(model);

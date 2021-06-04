@@ -96,7 +96,7 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
-        public void HandleMultipleResultsThatOnlyHaveResultdWithErrorsShouldReturnHttpStatusCodeBadRequest()
+        public void HandleMultipleResultsThatAreAllErrorsShouldReturnHttpStatusCodeBadRequest()
         {
             var useCaseResults = new List<UseCaseResult<Data>>() { useCaseResultWithErrors, useCaseResultWithErrors };
             presenter.Handle(useCaseResults);
@@ -106,7 +106,7 @@ namespace Api.UnitTests.Presenter
         }
 
         [Test]
-        public void HandleMultipleResultShouldSerializeDataToJsonObjectDataPropertyOfResponse()
+        public void HandleMultipleResultsShouldSerializeDataToJsonObjectDataPropertyOfResponse()
         {
             var useCaseResults = new List<UseCaseResult<Data>>() { useCaseResultWithNoErrors, useCaseResultWithErrors };
             presenter.Handle(useCaseResults);

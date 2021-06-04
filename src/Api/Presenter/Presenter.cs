@@ -24,20 +24,27 @@ namespace CleanTemplate.Api
         }
         public void Handle(UseCaseResultMessageBase response)
         {
+            var noContent = response == null;
+
             var contentResult = ActionResult as ContentResult;
-            if (response.AnyValidationErrors())
+            if (noContent)
+            {
+                contentResult.StatusCode = (int)HttpStatusCode.NoContent;
+            }
+            else if(response.AnyValidationErrors())
             {
                 contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
             } 
             else if (response.AnyNotFoundErrors()) 
             {
-                contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
+                contentResult.StatusCode = (int)HttpStatusCode.NotFound;
             }
             else
             {
                 contentResult.StatusCode = (int)HttpStatusCode.OK;
             }
-            contentResult.Content = JsonConvert.SerializeObject(response);
+            if (!noContent)
+                contentResult.Content = JsonConvert.SerializeObject(response);
         }
 
         /// <summary>
@@ -47,13 +54,16 @@ namespace CleanTemplate.Api
         /// <param name="responses"></param>
         public void Handle(IEnumerable<UseCaseResultMessageBase> responses)
         {
+            var noContent = !responses.ToList().Any();
             var areAllInvalid = responses.Where(w => w.AnyValidationErrors()).Count() == responses.Count();
-            object responseMessage = new { errors = responses.Select(x => x.Errors) };
-
             var areAllNotFound = responses.Where(w => w.AnyNotFoundErrors()).Count() == responses.Count();
 
             var contentResult = ActionResult as ContentResult;
-            if (areAllInvalid)
+            if (noContent)
+            {
+                contentResult.StatusCode = (int)HttpStatusCode.NoContent;
+            }
+            else if(areAllInvalid)
             {
                 contentResult.StatusCode = (int)HttpStatusCode.BadRequest;
             }
@@ -65,7 +75,8 @@ namespace CleanTemplate.Api
             {
                 contentResult.StatusCode = (int)HttpStatusCode.OK;
             }
-            contentResult.Content = JsonConvert.SerializeObject(responses);
+            if (!noContent)
+                contentResult.Content = JsonConvert.SerializeObject(responses);
         }
 
         public void Handle(Exception exception, bool outputExceptionDetailsToResponse)

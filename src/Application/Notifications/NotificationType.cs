@@ -7,7 +7,7 @@ namespace CleanTemplate.Application.Notifications
         /// <summary>
         /// 
         /// </summary>
-        [CodeDescription("1", "Erro")]
+        [CodeDescription("1", "Error")]
         Error = 1,
 
         /// <summary>

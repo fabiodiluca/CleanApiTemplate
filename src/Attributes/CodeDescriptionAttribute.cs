@@ -4,13 +4,13 @@ namespace CleanTemplate.Attributes
 {
     public class CodeDescriptionAttribute : Attribute
     {
-        public CodeDescriptionAttribute(string codigo, string descricao)
+        public CodeDescriptionAttribute(string code, string descricao)
         {
-            this.Codigo = codigo;
-            this.Descricao = descricao;
+            this.Code = code;
+            this.Description = descricao;
         }
 
-        public string Codigo { get; }
-        public string Descricao { get; }
+        public string Code { get; }
+        public string Description { get; }
     }
 }

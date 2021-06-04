@@ -14,8 +14,8 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
     public class WeatherForeCastUseCase : UseCaseBase, IWeatherForeCastUseCase
     {
         private readonly ILogger<WeatherForeCastUseCase> _logger;
-        protected readonly IWeatherForeCastRepository _repository;
-        protected readonly IPersistenceContext<WeatherForecastPostRequest, WeatherForeCast, WeatherForeCast> _persistenceContext;
+        private readonly IWeatherForeCastRepository _repository;
+        private readonly IPersistenceContext<WeatherForecastPostRequest, WeatherForeCast, WeatherForeCast> _persistenceContext;
 
         public WeatherForeCastUseCase(
             ILogger<WeatherForeCastUseCase> logger,
@@ -35,6 +35,7 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             var results = CreateResultList<WeatherForecastGetResponse>();
 
             var list = _repository.Select();
+
             foreach (var weatherForeCast in list)
             {
                 _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
@@ -51,12 +52,12 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             {
                 var weatherForeCast = _repository.Select(id);
                 var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
-                _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
+                _logger.LogDebug("Adding result for id {id}", weatherForeCast.Id);
                 results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
             }
             catch (EntityNotFoundException)
             {
-                _logger.LogDebug("Adicionando resultado EntityNotFoundException para id {id}", id);
+                _logger.LogDebug("Adding EntityNotFoundException result for id {id}", id);
                 results.AddSpecifiedIdDoesNotExist();
             }
             return results.ToArray();
@@ -95,6 +96,34 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
                      .Select(y => y.Id.Value)
                      .ToList()
              ).Select(x => x.Id).ToList();
+        }
+
+        public UseCaseResult<int>[] Delete(int id)
+        {
+            return Delete(new List<int>(id));
+        }
+
+        public UseCaseResult<int>[] Delete(List<int> ids)
+        {
+            //TODO repository must have a repository to return only ids for better performance
+            var existingIds = _repository.Select(ids).Select(x => x.Id).ToList();
+            var results = CreateResultList<int>();
+
+            _unitOfWork.BeginTransaction();
+            foreach(int id in ids)
+            {
+                if (!existingIds.Contains(id))
+                {
+                    results.AddSpecifiedIdDoesNotExist();
+                } 
+                else
+                {
+                    _repository.Delete(id);
+                    results.Add(new UseCaseResult<int>(id));
+                }
+            }
+            _unitOfWork.Commit();
+            return results.ToArray();
         }
     }
 }

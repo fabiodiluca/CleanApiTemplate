@@ -4,6 +4,7 @@ using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Get;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Net;
 
 namespace CleanTemplate.Api.Controllers
@@ -30,9 +31,10 @@ namespace CleanTemplate.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(UseCaseResult<WeatherForecastGetResponse>[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.NoContent)]
         public IActionResult Get(int? Id)
         {
-            _logger.LogInformation("Getting WeatherForecast");
+            _logger.LogInformation("Get WeatherForecast");
             if (Id.HasValue)
                 _presenter.Handle(_weatherForeCastUseCase.Get(Id.Value));
             else
@@ -46,8 +48,19 @@ namespace CleanTemplate.Api.Controllers
         [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.InternalServerError)]
         public IActionResult Post([FromBody] WeatherForecastPostRequest[] models)
         {
-            _logger.LogInformation("Posted WeatherForecast");
+            _logger.LogInformation("Post WeatherForecast");
             _presenter.Handle(_weatherForeCastUseCase.Post(models));
+            return _presenter.ActionResult;
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(typeof(UseCaseResult<int>[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(UseCaseResultMessageBase), (int)HttpStatusCode.InternalServerError)]
+        public IActionResult Delete([FromBody] int[] ids)
+        {
+            _logger.LogInformation("Delete WeatherForecast");
+            _presenter.Handle(_weatherForeCastUseCase.Delete(new List<int>(ids)));
             return _presenter.ActionResult;
         }
     }
