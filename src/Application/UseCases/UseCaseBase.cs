@@ -51,18 +51,18 @@ namespace CleanTemplate.Application.UseCases
                         !IsAlreadyPersistedDomainInFunction(persistenceAssociation))
                     {
                         results.AddSpecifiedIdDoesNotExist();
-                        break;
+                        continue;
                     }
                     var resultData = persistenceFunction(persistenceAssociation);
                     result = new UseCaseResult<TResponse>(resultData);
                     results.Add(result);
-                    break;
+                    continue;
                 }
                 else
                 {
                     result = new UseCaseResult<TResponse>(persistenceAssociation.validationResult);
                     results.Add(result);
-                    break;
+                    continue;
                 }
             }
             return results;
