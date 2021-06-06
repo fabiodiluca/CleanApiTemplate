@@ -4,9 +4,6 @@ using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Get;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 
 namespace CleanTemplate.Api.Controllers
