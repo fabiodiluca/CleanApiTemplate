@@ -65,15 +65,15 @@ namespace CleanTemplate.Data.Repositories.NHibernate
             var dataModel = _mapper.Map<WeatherForeCastDataModel>(model);
             var mergedModel = _session.Merge(dataModel);
             _session.Update(mergedModel);
-            return _mapper.Map<WeatherForeCast>(dataModel);
+            return _mapper.Map<WeatherForeCast>(mergedModel);
         }
 
         public WeatherForeCast InsertOrUpdate(WeatherForeCast model)
         {
-            var dataModel = _mapper.Map<WeatherForeCastDataModel>(model);
-            var mergedModel = _session.Merge(dataModel);
-            _session.SaveOrUpdate(mergedModel);
-            return _mapper.Map<WeatherForeCast>(dataModel);
+            if (model.Id > 0)
+                return Update(model);
+            else
+                return Insert(model);
         }
 
         public List<WeatherForeCast> Insert(List<WeatherForeCast> models)

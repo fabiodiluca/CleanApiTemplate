@@ -30,35 +30,27 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
             _persistenceContext = persistenceContext;
         }
 
-        public UseCaseResult<WeatherForecastGetResponse>[] Get()
+        public UseCaseResult<WeatherForecastGetResponse>[] Get(int[] ids)
         {
             var results = CreateResultList<WeatherForecastGetResponse>();
 
-            var list = _repository.Select();
+            List<WeatherForeCast> list;
+            if (ids.Length > 0)
+                list = _repository.Select(ids.ToList());
+            else
+                list = _repository.Select();
 
-            foreach (var weatherForeCast in list)
+            foreach (var id in ids)
             {
-                _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
-                var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
-                results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
-            }
-            return results.ToArray();
-        }
-
-        public UseCaseResult<WeatherForecastGetResponse>[] Get(int id)
-        {
-            var results = CreateResultList<WeatherForecastGetResponse>();
-            try
-            {
-                var weatherForeCast = _repository.Select(id);
-                var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
-                _logger.LogDebug("Adding result for id {id}", weatherForeCast.Id);
-                results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
-            }
-            catch (EntityNotFoundException)
-            {
-                _logger.LogDebug("Adding EntityNotFoundException result for id {id}", id);
-                results.AddSpecifiedIdDoesNotExist();
+                if (list.Where(x => x.Id == id).Any())
+                {
+                    var weatherForeCast = list.Where(x => x.Id == id).First();
+                    _logger.LogDebug("Adicionando resultado para id {id}", weatherForeCast.Id);
+                    var response = _mapper.Map<WeatherForecastGetResponse>(weatherForeCast);
+                    results.Add(new UseCaseResult<WeatherForecastGetResponse>(response));
+                }
+                else
+                    results.AddSpecifiedIdDoesNotExist();
             }
             return results.ToArray();
         }
@@ -98,15 +90,10 @@ namespace CleanTemplate.Application.UseCases.WeatherForecast
              ).Select(x => x.Id).ToList();
         }
 
-        public UseCaseResult<int>[] Delete(int id)
-        {
-            return Delete(new List<int>(id));
-        }
-
-        public UseCaseResult<int>[] Delete(List<int> ids)
+        public UseCaseResult<int>[] Delete(int[] ids)
         {
             //TODO repository must have a repository to return only ids for better performance
-            var existingIds = _repository.Select(ids).Select(x => x.Id).ToList();
+            var existingIds = _repository.Select(ids.ToList()).Select(x => x.Id).ToList();
             var results = CreateResultList<int>();
 
             _unitOfWork.BeginTransaction();
