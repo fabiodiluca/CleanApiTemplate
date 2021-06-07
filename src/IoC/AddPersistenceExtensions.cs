@@ -1,7 +1,9 @@
 ﻿using CleanTemplate.Api.Settings.Persistence;
 using CleanTemplate.Application.UseCases;
 using CleanTemplate.Application.UseCases.WeatherForecast.Messages.Post;
+using CleanTemplate.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace CleanTemplate.IoC
 {
@@ -9,16 +11,21 @@ namespace CleanTemplate.IoC
     {
         public static void AddPersistence(this IServiceCollection services, PersistenceSettings persistenceSettings)
         {
-            switch(persistenceSettings.Database)
+            DatabaseSource databaseSource;
+            var parsed = Enum.TryParse(persistenceSettings.Database, out databaseSource);
+            if (!parsed)
+                throw new NotImplementedException($"Persistence '{persistenceSettings.Database}' not implemented yet.");
+
+            switch (databaseSource)
             {
-                case "SQLite3":
+                case  DatabaseSource.SQLite3:
                     services.AddPersistenceSQLite3(persistenceSettings);
                     break;
-                case "MsSql2012":
+                case DatabaseSource.MsSql2012:
                     services.AddPersistenceMsSql2012(persistenceSettings);
                     break;
                 default:
-                    throw new System.NotImplementedException($"Persistence '{persistenceSettings.Database}' not implemented yet.");
+                    throw new NotImplementedException($"Persistence '{persistenceSettings.Database}' not implemented yet.");
             }
 
              services.AddScoped<

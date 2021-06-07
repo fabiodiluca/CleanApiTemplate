@@ -1,5 +1,6 @@
 ﻿using CleanTemplate.Api.Settings;
 using CleanTemplate.Api.Settings.Persistence;
+using CleanTemplate.Attributes;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,9 +56,14 @@ namespace CleanTemplate.Migrations.Runner
 
         private static void _ConfigureRunner(IMigrationRunnerBuilder migrationRunnerBuilder, PersistenceSettings persistenceSettings)
         {
-            switch (persistenceSettings.Database)
+            DatabaseSource databaseSource;
+            var parsed = Enum.TryParse(persistenceSettings.Database, out databaseSource);
+            if (!parsed)
+                throw new NotImplementedException($"Persistence '{persistenceSettings.Database}' not implemented yet.");
+
+            switch (databaseSource)
             {
-                case "SQLite3":
+                case DatabaseSource.SQLite3:
                     migrationRunnerBuilder.ConfigureRunnerSQLite3(persistenceSettings);
                     break;
                 ////case "MsSql2012":
