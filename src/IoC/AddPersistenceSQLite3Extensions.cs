@@ -1,4 +1,5 @@
 ﻿using CleanTemplate.Api.Settings.Persistence;
+using CleanTemplate.Migrations.Runner;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,13 +25,7 @@ namespace CleanTemplate.IoC
             services
             // Add common FluentMigrator services
             .AddFluentMigratorCore()
-            .ConfigureRunner(rb => rb
-                // Add SQLite support to FluentMigrator
-                .AddSQLite()
-                // Set the connection string
-                .WithGlobalConnectionString(persistenceSettings.ConnectionString)
-                // Define the assembly containing the migrations
-                .ScanIn(Assemblies.Migrations).For.Migrations())
+            .ConfigureRunner(rb => rb.ConfigureRunnerSQLite3(persistenceSettings))
             // Enable logging to console in the FluentMigrator way
             .AddLogging(lb => lb.AddFluentMigratorConsole());
         }

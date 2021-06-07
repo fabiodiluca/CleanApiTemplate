@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>CleanTemplate.Attributes</AssemblyName>
     <RootNamespace>CleanTemplate.Attributes</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
