@@ -2,9 +2,8 @@
 
 namespace CleanTemplate.Data.Model
 {
-    public class WeatherForeCastDataModel : IDataModel
+    public class WeatherForeCastDataModel : DataModel
     {
-        public virtual int Id { get; set; }
         public virtual DateTime Date { get; set; }
 
         public virtual int TemperatureC { get; set; }
