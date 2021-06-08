@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace CleanTemplate.Data.Repositories.NHibernate
 {
-    public class RepositoryBase<TDomain, TData> : IRepository<TDomain> 
+    public abstract class RepositoryBase<TDomain, TData> : IRepository<TDomain> 
         where TDomain : IDomainModel
         where TData: DataModel
     {
