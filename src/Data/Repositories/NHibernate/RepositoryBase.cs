@@ -26,6 +26,7 @@ namespace CleanTemplate.Data.Repositories.NHibernate
 
         public List<TDomain> Select()
         {
+            var a = _session.QueryOver<TData>();
 
             return _mapper.Map<List<TDomain>>(
                 _session.QueryOver<TData>().List()
