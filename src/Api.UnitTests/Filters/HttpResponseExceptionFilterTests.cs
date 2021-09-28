@@ -2,9 +2,9 @@
 using CleanTemplate.Api.Filters;
 using CleanTemplate.Application.Notifications;
 using CleanTemplate.Application.UseCases;
+using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -15,8 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
-using System.Threading;
 
 namespace Api.Tests.Filters
 {
@@ -35,13 +33,13 @@ namespace Api.Tests.Filters
             log = new Mock<ILogger<HttpResponseExceptionFilter>>();
 
             httpResponseExceptionFilter = new HttpResponseExceptionFilter(
-                  _SetupPresenterMock().Object
+                  _SetupPresenter().Object
                 , webHostingEnvironmentMock.Object
                 , log.Object
             );
         }
 
-        private Mock<IPresenter> _SetupPresenterMock()
+        private Mock<IPresenter> _SetupPresenter()
         {
             var contentResult = new ContentResult();
             contentResult.StatusCode = (int)HttpStatusCode.InternalServerError;
@@ -54,15 +52,17 @@ namespace Api.Tests.Filters
             contentResult.Content = JsonConvert.SerializeObject(response);
 
             var presenterMock = new Mock<IPresenter>();
-            presenterMock.Setup(x => x.ActionResult)
+            presenterMock
+                .Setup(x => x.ActionResult)
                 .Returns(contentResult);
+
             return presenterMock;
         }
 
-        private Mock<ActionExecutedContext> _SetupActionExecutedContextMock()
+        private Mock<ActionExecutedContext> _SetupActionExecutedContext()
         {
             var actionContextMock = new Mock<ActionContext>();
-            actionContextMock.Object.HttpContext = new FakeHttpContext();
+            actionContextMock.Object.HttpContext = new DefaultHttpContext();
             actionContextMock.Object.RouteData = new Microsoft.AspNetCore.Routing.RouteData();
             actionContextMock.Object.ActionDescriptor = new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor();
 
@@ -73,16 +73,17 @@ namespace Api.Tests.Filters
             );
 
             //Simulates there it ocurred an exception on the context
-            actionExecutedContextMock.Setup(x => x.Exception)
+            actionExecutedContextMock
+                .Setup(x => x.Exception)
                 .Returns(new Exception("Context exception ocurred."));
 
             return actionExecutedContextMock;
         }
 
         [Test]
-        public void ResponseMustPresentAnErrorInContextResultIfThereIsAnExceptionInContext()
+        public void ResponseShouldConatinAnErrorInContextResultIfThereIsAnExceptionInContext()
         {
-            var actionExecutedContextMock = _SetupActionExecutedContextMock();
+            var actionExecutedContextMock = _SetupActionExecutedContext();
 
             IActionResult actionExecutedContextResult = null;
             actionExecutedContextMock
@@ -99,9 +100,9 @@ namespace Api.Tests.Filters
         }
 
         [Test]
-        public void MustSetExceptionHandledInContextIfThereIsAnExceptionInContext()
+        public void ShouldSetExceptionHandledInContextIfThereIsAnExceptionInContext()
         {
-            var actionExecutedContextMock = _SetupActionExecutedContextMock();
+            var actionExecutedContextMock = _SetupActionExecutedContext();
 
             bool actionExecutedContextExceptionHandled = false;
             actionExecutedContextMock
@@ -112,13 +113,13 @@ namespace Api.Tests.Filters
 
             httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
 
-            Assert.AreEqual(true, actionExecutedContextExceptionHandled);
+            actionExecutedContextExceptionHandled.Should().BeTrue();
         }
 
         [Test]
-        public void MustLogErrorExceptionHandledInContextIfThereIsAnExceptionInContext()
+        public void ShouldLogErrorExceptionHandledInContextIfThereIsAnExceptionInContext()
         {
-            var actionExecutedContextMock = _SetupActionExecutedContextMock();
+            var actionExecutedContextMock = _SetupActionExecutedContext();
 
             httpResponseExceptionFilter.OnActionExecuted(actionExecutedContextMock.Object);
 
@@ -130,31 +131,6 @@ namespace Api.Tests.Filters
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true))
             );
-        }
-
-        internal class FakeHttpContext : HttpContext
-        {
-            public override IFeatureCollection Features => throw new NotImplementedException();
-
-            public override HttpRequest Request => throw new NotImplementedException();
-
-            public override HttpResponse Response => throw new NotImplementedException();
-
-            public override ConnectionInfo Connection => throw new NotImplementedException();
-
-            public override WebSocketManager WebSockets => throw new NotImplementedException();
-
-            public override ClaimsPrincipal User { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-            public override IDictionary<object, object> Items { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-            public override IServiceProvider RequestServices { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-            public override CancellationToken RequestAborted { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-            public override string TraceIdentifier { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-            public override ISession Session { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public override void Abort()
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

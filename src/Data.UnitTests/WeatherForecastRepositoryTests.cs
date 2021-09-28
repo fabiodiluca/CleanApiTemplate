@@ -2,9 +2,9 @@ using AutoMapper;
 using CleanTemplate.Application.Repositories;
 using CleanTemplate.Data.Model;
 using CleanTemplate.Data.Repositories.NHibernate;
-using CleanTemplate.Domain;
 using CleanTemplate.IoC;
 using CleanTemplate.UnitOfWork;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NHibernate;
@@ -18,9 +18,10 @@ namespace Data.UnitTests
     {
         IServiceProvider serviceProvider;
         IMapper mapper;
-        Mock<ISession> sessionMock;
-        Mock<IUnitOfWork> unitOfWorkMock;
-        Mock<IQueryOver<WeatherForeCastDataModel, WeatherForeCastDataModel>> queryOverMock;
+        Mock<ISession> session;
+        Mock<IUnitOfWork> unitOfWork;
+        Mock<IQueryOver<WeatherForeCastDataModel, WeatherForeCastDataModel>> queryOver;
+        IWeatherForeCastRepository repository;
 
         [SetUp]
         public void Setup()
@@ -32,25 +33,36 @@ namespace Data.UnitTests
             {
                 mapper = scope.ServiceProvider.GetService<IMapper>();
             }
-            sessionMock = new Mock<ISession>();
-            unitOfWorkMock = new Mock<IUnitOfWork>();
-            queryOverMock = new Mock<IQueryOver<WeatherForeCastDataModel, WeatherForeCastDataModel>>();
+
+            session = new Mock<ISession>();
+            unitOfWork = new Mock<IUnitOfWork>();
+            queryOver = new Mock<IQueryOver<WeatherForeCastDataModel, WeatherForeCastDataModel>>();
+
+            session
+                .Setup(x => x.QueryOver<WeatherForeCastDataModel>())
+                .Returns(queryOver.Object);
+
+            repository = new WeatherForeCastRepository(unitOfWork.Object, mapper);
         }
 
         [Test]
         public void Select()
         {
-            sessionMock.Setup(x => x.QueryOver<WeatherForeCastDataModel>())
-                .Returns(queryOverMock.Object);
-            queryOverMock.Setup(x => x.List())
-                .Returns(new List<WeatherForeCastDataModel>() { new WeatherForeCastDataModel() { Id = 3 }, new WeatherForeCastDataModel() { Id = 7 } });
-            unitOfWorkMock.Setup(x => x.Session)
-                .Returns(sessionMock.Object);
+            queryOver
+                .Setup(x => x.List())
+                .Returns(new List<WeatherForeCastDataModel>() 
+                { 
+                    new WeatherForeCastDataModel() { Id = 3 }, 
+                    new WeatherForeCastDataModel() { Id = 7 } 
+                });
 
-            IWeatherForeCastRepository repository = new WeatherForeCastRepository(unitOfWorkMock.Object, mapper);
+            unitOfWork
+                .Setup(x => x.Session)
+                .Returns(session.Object);
+
             var list = repository.Select();
-            Assert.AreEqual(list[0].Id, 3);
-            Assert.AreEqual(list[1].Id, 7);
+            list[0].Id.Should().Be(3);
+            list[1].Id.Should().Be(7);
         }
     }
 }
